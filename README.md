@@ -2,8 +2,7 @@
 
 A fast and reliable crypto-market explorer that provides real-time data for thousands of coins, global market stats, trending assets, and detailed coin insights. Users can browse coins, view price history, and track favorites with a personal wishlist—all updated automatically for an accurate, up-to-date experience.
 
-## Live Demo
-https://crypto-tracker-iota-six.vercel.app/
+
 
 ## Features
 
