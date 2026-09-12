@@ -6,7 +6,6 @@ import { WishlistProvider } from './context/wishlistcontext';
 import { Wishlist } from './components/wishlist';
 import { Trending } from './components/Trending';
 import { AIEvaluator } from './components/AIEvaluator/AIEvaluator';
-import { FormatProvider } from './context/Formatingcontext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginForm } from './components/login-form';
 import { SignupForm } from './components/signup-form';
@@ -16,7 +15,7 @@ import { Loading } from './components/Loading';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
-  
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0d1421]">
@@ -24,7 +23,7 @@ const ProtectedRoute = ({ children }) => {
       </div>
     );
   }
-  
+
   return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
@@ -34,7 +33,6 @@ function App() {
   return (
     <>
       <AuthProvider>
-      <FormatProvider>
         <WishlistProvider>
           <Header />
           <Routes>
@@ -47,7 +45,6 @@ function App() {
             <Route path="/ai-evaluator" element={<ProtectedRoute><AIEvaluator /></ProtectedRoute>} />
           </Routes>
         </WishlistProvider>
-      </FormatProvider>
       </AuthProvider>
     </>
   );
