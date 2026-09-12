@@ -5,7 +5,7 @@ import { CoinDetail } from './components/Coindetail';
 import { WishlistProvider } from './context/wishlistcontext';
 import { Wishlist } from './components/wishlist';
 import { Trending } from './components/Trending';
-import { AIEvaluator } from './components/AIEvaluator/AIEvaluator';
+
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginForm } from './components/login-form';
 import { SignupForm } from './components/signup-form';
@@ -42,7 +42,7 @@ function App() {
             <Route path="/trending" element={<Trending />} />
             <Route path="/coindetail/:id" element={<CoinDetail />} />
             <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-            <Route path="/ai-evaluator" element={<ProtectedRoute><AIEvaluator /></ProtectedRoute>} />
+
           </Routes>
         </WishlistProvider>
       </AuthProvider>
