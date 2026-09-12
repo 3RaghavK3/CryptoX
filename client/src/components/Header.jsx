@@ -39,6 +39,14 @@ export function Header() {
         >
           Wishlist
         </span>
+        <span
+          className="text-[#f5c64f] font-semibold"
+          onClick={() => {
+            navigate('/ai-evaluator');
+          }}
+        >
+          AI Evaluator
+        </span>
       </div>
     </header>
   );

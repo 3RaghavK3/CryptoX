@@ -7,7 +7,11 @@ import authRoutes from "./01-routes/auth.routes.js";
 import coinsRoutes from "./01-routes/coins.routes.js";
 import alertsRoutes from "./01-routes/alerts.routes.js";
 import wishlistRoutes from "./01-routes/wishlist.routes.js";
+import usersRoutes from "./01-routes/users.routes.js";
+import exchangeRoutes from "./01-routes/exchange.routes.js";
+import portfolioRoutes from "./01-routes/portfolio.routes.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 dotenv.config();
 
@@ -49,11 +53,15 @@ async function start() {
   }
 }
 
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authRoutes);
+app.use("/api/users", usersRoutes);
 app.use("/api/coins", coinsRoutes);
 app.use("/api/alerts", alertsRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/exchange", exchangeRoutes);
+app.use("/api/portfolio", portfolioRoutes);
 app.use(errorHandler);
 start();

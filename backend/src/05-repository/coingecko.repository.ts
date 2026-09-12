@@ -1,4 +1,5 @@
-import { coinGeckoMarketApi } from "../config/coingecko.js";
+import { coinGeckoMarketApi, coinGeckoDetailApi } from "../config/coingecko.js";
+import pool from "../config/db.js";
 
 export const getMarkets = async (
     vsCurrency: string,
@@ -23,7 +24,7 @@ export const getMarkets = async (
 };
 
 export const getCoinDetail = async (coinId: string) => {
-    const response = await coinGeckoMarketApi.get(`/coins/${coinId}`);
+    const response = await coinGeckoDetailApi.get(`/coins/${coinId}`);
     return response.data;
 };
 
@@ -38,11 +39,15 @@ export const getTrendingCoins = async () => {
 };
 
 export const search = async (query: string) => {
-    const response = await coinGeckoMarketApi.get("/search", {
-        params: {
-            query,
-        },
-    });
+    const formattedQuery = `${query}%`;
+    const result = await pool.query(
+        `SELECT coin_id as id, name, symbol, image_url as large
+         FROM coins
+         WHERE lower(name) LIKE lower($1) OR lower(symbol) LIKE lower($1)
+         ORDER BY market_cap_rank ASC NULLS LAST
+         LIMIT 5`,
+        [formattedQuery]
+    );
 
-    return response.data;
+    return { coins: result.rows };
 };

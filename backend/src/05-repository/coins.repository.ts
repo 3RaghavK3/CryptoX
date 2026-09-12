@@ -1,29 +1,22 @@
 
 import pool from "../config/db.js";
 
-export const getMarketsFromDb = async (page: number, perPage: number, orderBy: string) => {
-    let orderClause = "market_cap DESC NULLS LAST";
+export const getMarketsFromDb = async (page: number, perPage: number, sortBy: string, dir: string) => {
+    const columnMapping: Record<string, string> = {
+        rank: 'market_cap_rank',
+        market_cap: 'market_cap',
+        price: 'current_price',
+        change_1h: 'price_change_percentage_1h',
+        change_24h: 'price_change_percentage_24h',
+        change_7d: 'price_change_percentage_7d',
+        volume: 'total_volume',
+        name: 'name',
+        id: 'coin_id'
+    };
 
-    switch (orderBy) {
-        case "market_cap_asc":
-            orderClause = "market_cap ASC NULLS LAST";
-            break;
-        case "market_cap_desc":
-            orderClause = "market_cap DESC NULLS LAST";
-            break;
-        case "volume_asc":
-            orderClause = "total_volume ASC NULLS LAST";
-            break;
-        case "volume_desc":
-            orderClause = "total_volume DESC NULLS LAST";
-            break;
-        case "id_asc":
-            orderClause = "coin_id ASC";
-            break;
-        case "id_desc":
-            orderClause = "coin_id DESC";
-            break;
-    }
+    const dbColumn = columnMapping[sortBy] || 'market_cap';
+    const direction = dir === 'asc' ? 'ASC' : 'DESC';
+    const orderClause = `${dbColumn} ${direction} NULLS LAST`;
 
     const offset = (page - 1) * perPage;
 
@@ -44,7 +37,12 @@ export const getGlobalDataFromDb = async () => {
 };
 
 export const getTrendingCoinsFromDb = async () => {
-    const query = `SELECT * FROM trending_coins ORDER BY trend_rank ASC`;
+    const query = `
+        SELECT tc.*, c.name, c.symbol, c.image_url, c.current_price, c.market_cap_rank
+        FROM trending_coins tc
+        JOIN coins c ON tc.coin_id = c.coin_id
+        ORDER BY tc.trend_rank ASC
+    `;
     const result = await pool.query(query);
     return result.rows;
 };

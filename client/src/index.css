@@ -1,1 +1,7 @@
 @import 'tailwindcss';
+
+@layer base {
+  body {
+    @apply bg-[#0d1421] text-white min-h-screen;
+  }
+}

@@ -25,3 +25,6 @@ dist-ssr
 /node_modules
 .vercel
 .env
+client/conext/Formatingcontext.jsx
+# Ignore AI Evaluator completely
+client/src/components/AIEvaluator/

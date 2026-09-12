@@ -1,16 +1,20 @@
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
-export function Global() {
+export function Global({ onLoad }) {
   const [globalarray, settglobalarray] = useState(null);
 
   useEffect(() => {
     // @ts-ignore
-    fetch(`${import.meta.env.VITE_API_URL}/api/global`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/coins/global`)
       .then((res) => res.json())
       .then((json) => {
-        settglobalarray(json.data);
+        // Backend returns the object directly, not wrapped in data
+        settglobalarray(json.data || json);
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.log(e))
+      .finally(() => {
+        if (onLoad) onLoad();
+      });
   }, []);
 
   const formatNumber = (num) => {
@@ -23,7 +27,7 @@ export function Global() {
   return (
     <>
       <div className="relative bg-[#0d1421] flex-2 text-white md:text-lg lg:text-2xl text-sm">
-     
+
 
         <div className='flex flex-row h-64 lg:h-96'>
           <div
@@ -31,14 +35,14 @@ export function Global() {
             <div className="rounded-md bg-[#0d1421] p-2">
               <div className="flex flex-col font-bold text-white">Market-Cap</div>
               <div className="font-semibold text-[#f2d27b] break-words">
-                {globalarray ? `$${formatNumber(globalarray.total_market_cap.btc)}` : 'Loading...'}
+                {globalarray ? `$${formatNumber(globalarray.total_market_cap?.usd || globalarray.total_market_cap || 0)}` : 'Loading...'}
               </div>
             </div>
 
             <div className="rounded-md bg-[#0d1421] p-2">
               <div className="flex flex-col font-bold text-white">Total Volume (24h)</div>
               <div className="font-semibold text-[#f2d27b] break-words">
-                {globalarray ? `$${formatNumber(globalarray.total_volume.usd)}` : 'Loading...'}
+                {globalarray ? `$${formatNumber(globalarray.total_volume?.usd || globalarray.total_volume_24h || 0)}` : 'Loading...'}
               </div>
             </div>
 
@@ -48,17 +52,17 @@ export function Global() {
                 {globalarray ? (
                   <>
                     <span className="font-semibold text-[#f2d27b] break-words flex">
-                      {'$' + formatNumber(globalarray.market_cap_change_percentage_24h_usd) + '%'}
-                       {globalarray.market_cap_change_percentage_24h_usd > 0 ? (
-                      <ArrowUp className='text-[#17D082]' />
-                    
-                    ) : (
-                      <ArrowDown className='text-[#F43D46]' />
-                      
-                    )}
+                      {formatNumber(globalarray.market_cap_change_percentage_24h_usd || globalarray.market_cap_change_percentage_24h || 0) + '%'}
+                      {(globalarray.market_cap_change_percentage_24h_usd || globalarray.market_cap_change_percentage_24h || 0) > 0 ? (
+                        <ArrowUp className='text-[#17D082]' />
+
+                      ) : (
+                        <ArrowDown className='text-[#F43D46]' />
+
+                      )}
                     </span>
 
-                   
+
                   </>
                 ) : (
                   'Loading...'

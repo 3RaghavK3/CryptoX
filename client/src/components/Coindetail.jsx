@@ -3,17 +3,52 @@ import { use, useContext, useEffect, useState } from 'react';
 import { useFetcher, useParams } from 'react-router-dom';
 import { Header } from './Header';
 import { FormatContext } from '../context/Formatingcontext';
-
+import { Loading } from './Loading';
 export function CoinDetail() {
   const { id } = useParams();
   const [CoinDetailArray, setCoinDetailArray] = useState(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     setLoading(true);
-    fetch(`${import.meta.env.VITE_API_URL}/api/coindetail?id=${id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/coins/${id}`)
       .then((res) => res.json())
       .then((data) => {
-            setCoinDetailArray(data);
+            const mappedData = {
+              ...data,
+              market_data: {
+                current_price: { usd: data.current_price, inr: data.current_price },
+                high_24h: { usd: data.high_24h, inr: data.high_24h },
+                low_24h: { usd: data.low_24h, inr: data.low_24h },
+                ath: { usd: data.ath, inr: data.ath },
+                ath_date: { usd: data.ath_date, inr: data.ath_date },
+                ath_change_percentage: { usd: data.ath_change_percentage, inr: data.ath_change_percentage },
+                atl: { usd: data.atl, inr: data.atl },
+                atl_date: { usd: data.atl_date, inr: data.atl_date },
+                atl_change_percentage: { usd: data.atl_change_percentage, inr: data.atl_change_percentage },
+                market_cap: { usd: data.market_cap, inr: data.market_cap },
+                fully_diluted_valuation: { usd: data.fully_diluted_valuation, inr: data.fully_diluted_valuation },
+                total_volume: { usd: data.total_volume, inr: data.total_volume },
+                circulating_supply: data.circulating_supply,
+                total_supply: data.total_supply,
+                max_supply: data.max_supply,
+                price_change_percentage_1h_in_currency: { usd: data.price_change_percentage_1h, inr: data.price_change_percentage_1h },
+                price_change_percentage_24h_in_currency: { usd: data.price_change_percentage_24h, inr: data.price_change_percentage_24h },
+                price_change_percentage_7d_in_currency: { usd: data.price_change_percentage_7d, inr: data.price_change_percentage_7d },
+                price_change_percentage_14d_in_currency: { usd: data.price_change_percentage_14d, inr: data.price_change_percentage_14d },
+                price_change_percentage_30d_in_currency: { usd: data.price_change_percentage_30d, inr: data.price_change_percentage_30d },
+                price_change_percentage_1y_in_currency: { usd: data.price_change_percentage_1y, inr: data.price_change_percentage_1y },
+                market_cap_change_percentage_24h_in_currency: { usd: data.market_cap_change_percentage_24h, inr: data.market_cap_change_percentage_24h }
+              },
+              image: { large: data.image_url },
+              description: { en: data.description },
+              links: {
+                homepage: [data.homepage],
+                whitepaper: data.whitepaper,
+                subreddit_url: data.subreddit_url,
+                repos_url: { github: [data.github_repositories] }
+              }
+            };
+            setCoinDetailArray(mappedData);
             setLoading(false)
           })
       .catch((e) => console.error(e + ' Error in fetching coindetail'))
@@ -36,12 +71,11 @@ export function CoinDetail() {
 
   return (
     <>
-      <Header />
         
-      <div className="p-4 text-white text-sm lg:text-base">
+      <div className="p-4 bg-[#0d1421] min-h-screen text-white text-sm lg:text-base">
         {
-          loading?<div className="flex items-center justify-center h-screen text-white text-xl md:text-3xl lg:text-5xl">
-          Loading...
+          loading?<div className="flex items-center justify-center h-screen text-xl md:text-3xl lg:text-5xl">
+          <Loading />
            </div>
           :<>
            

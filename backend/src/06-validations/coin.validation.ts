@@ -3,14 +3,19 @@ import { z } from "zod";
 export const getMarketsSchema = z.object({
     vs_currency: z.string().default("usd"),
 
-    order: z.enum([
-        "market_cap_asc",
-        "market_cap_desc",
-        "volume_asc",
-        "volume_desc",
-        "id_asc",
-        "id_desc",
-    ]).default("market_cap_desc"),
+    sort_by: z.enum([
+        "rank",
+        "market_cap",
+        "price",
+        "change_1h",
+        "change_24h",
+        "change_7d",
+        "volume",
+        "name",
+        "id"
+    ]).default("market_cap"),
+
+    dir: z.enum(["asc", "desc"]).default("desc"),
 
     per_page: z.coerce
         .number()

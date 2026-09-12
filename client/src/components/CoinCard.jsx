@@ -3,6 +3,7 @@ import { SparkLine } from './SparkLine';
 import { useContext } from 'react';
 import { WishlistContext } from '../context/wishlistcontext';
 import { ArrowDown, ArrowUp } from 'lucide-react';
+import { TableCell, TableRow } from "@/components/ui/table";
 
 export function CoinCard({
   id,
@@ -50,30 +51,31 @@ export function CoinCard({
   };
 
   const formatNumber = (num) => {
-    return typeof num === 'number'
-      ? num.toLocaleString(undefined, {
+    const parsed = Number(num);
+    return !isNaN(parsed) && num !== null && num !== undefined
+      ? parsed.toLocaleString(undefined, {
           minimumFractionDigits: 0,
           maximumFractionDigits: 2,
         })
       : '--';
   };
 
-
   const checkTrend = (percentage) => {
-    if (typeof percentage !== 'number') return ['gray', ''];
-    return percentage > 0 ? 'up' :'down' ;
+    const parsed = Number(percentage);
+    if (isNaN(parsed) || percentage === null || percentage === undefined) return ['gray', ''];
+    return parsed > 0 ? 'up' :'down' ;
   };
 
   return (
-     <div className='contents text-sm lg:text-lg md:text-base' onClick={() => navigate(`/coindetail/${id}`)}>
-      <div 
+     <TableRow className='text-sm lg:text-lg md:text-base border-slate-800 hover:bg-slate-800/50 cursor-pointer transition-colors' onClick={() => navigate(`/coindetail/${id}`)}>
+      <TableCell className="w-[50px] p-2"
         onClick={(e) => {
           e.stopPropagation();
           toggleStar();
         }}
       >
-        <div className='flex items-center justify-center p-3 '>
-          <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div className='flex items-center justify-center'>
+          <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" className="cursor-pointer">
             <polygon
               fill={isLiked ? 'yellow' : 'none'}
               stroke="white"
@@ -87,75 +89,90 @@ export function CoinCard({
             />
           </svg>
         </div>
-      </div >
+      </TableCell>
 
-      {rank !== undefined && <div>{rank}</div >}
+      <TableCell className="w-[40px] text-slate-400 p-2">{rank !== undefined ? rank : ''}</TableCell>
 
-      {image && name && symbol && (
-    <div className="">
-      <div className="flex items-center gap-2">
-        <img src={image} className="symbol-coin" alt="logo" />
-        <div className="flex items-center">
-          <span>{name}</span>
-          <span className="text-gray-400 ml-1 hidden md:block lg:block">
-            ({symbol.toUpperCase()})
-          </span>
-        </div>
-      </div>
-    </div>
-  )}
+      <TableCell className="p-2 font-medium max-w-[150px] md:max-w-[250px] whitespace-normal break-words">
+        {image && name && symbol && (
+          <div className="flex items-center gap-2">
+            <img src={image} className="w-6 h-6 md:w-8 md:h-8 rounded-full flex-shrink-0" alt="logo" />
+            <div className="flex flex-wrap items-center">
+              <span>{name}</span>
+              <span className="text-gray-400 ml-1 hidden md:inline-block">
+                ({symbol.toUpperCase()})
+              </span>
+            </div>
+          </div>
+        )}
+      </TableCell>
+
+      <TableCell className='p-2 font-semibold'>
+        {price !== undefined ? `$${formatNumber(price)}` : ''}
+      </TableCell>
+
+      <TableCell className='p-2 hidden lg:table-cell'>
+        {change1hr !== undefined && (
+          <div className='flex items-center gap-1 font-medium'>
+            {`${formatNumber(change1hr)}%`}
+            {checkTrend(change1hr) === 'up' ? (
+              <ArrowUp className='text-[#17D082] w-4 h-4' />
+            ) : (
+              <ArrowDown className='text-[#F43D46] w-4 h-4' />
+            )}
+          </div>
+        )}
+      </TableCell>
+
+      <TableCell className='p-2'>
+        {change24hr !== undefined && (
+          <div className='flex items-center gap-1 font-medium'>
+            {`${formatNumber(change24hr)}%`}
+            {checkTrend(change24hr) === 'up' ? (
+              <ArrowUp className='text-[#17D082] w-4 h-4' />
+            ) : (
+              <ArrowDown className='text-[#F43D46] w-4 h-4' />
+            )}
+          </div>
+        )}
+      </TableCell>
+
+      <TableCell className='p-2 hidden lg:table-cell'>
+        {change7d !== undefined && (
+          <div className='flex items-center gap-1 font-medium'>
+            {`${formatNumber(change7d)}%`}
+            {checkTrend(change7d) === 'up' ? (
+              <ArrowUp className='text-[#17D082] w-4 h-4' />
+            ) : (
+              <ArrowDown className='text-[#F43D46] w-4 h-4' />
+            )}
+          </div>
+        )}
+      </TableCell>
 
 
-      {price !== undefined && <div  className=' p-2'>${formatNumber(price)}</div >}
+      <TableCell className='p-2 hidden md:table-cell text-slate-300'>
+        {marketcap !== undefined ? `$${formatNumber(marketcap)}` : ''}
+      </TableCell>
 
-      {change1hr !== undefined && (
-        <div className='hidden lg:flex items-center gap-1'>
-          {`${formatNumber(change1hr)}%`}
-          {checkTrend(change1hr) === 'up' ? (
-            <ArrowUp className='text-[#17D082]' />
-          ) : (
-            <ArrowDown className='text-[#F43D46]' />
-          )}
-        </div>
-      )}
+      <TableCell className='p-2 hidden lg:table-cell text-slate-300'>
+        {volume !== undefined ? `$${formatNumber(volume)}` : ''}
+      </TableCell>
 
-      {change24hr !== undefined && (
-        <div className='flex items-center gap-1'>
-          {`${formatNumber(change24hr)}%`}
-          {checkTrend(change24hr) === 'up' ? (
-            <ArrowUp className='text-[#17D082]' />
-          ) : (
-            <ArrowDown className='text-[#F43D46]' />
-          )}
-        </div>
-      )}
+      <TableCell className='p-2 hidden lg:table-cell text-slate-300'>
+        {circulatingsupply !== undefined ? 
+          `${formatNumber(circulatingsupply)}` : ''
+        }
+      </TableCell>
 
-      {change7d !== undefined && (
-        <div className='hidden lg:flex items-center gap-1'>
-          {`${formatNumber(change7d)}%`}
-          {checkTrend(change7d) === 'up' ? (
-            <ArrowUp className='text-[#17D082]' />
-          ) : (
-            <ArrowDown className='text-[#F43D46]' />
-          )}
-        </div>
-      )}
-
-
-      {marketcap !== undefined && <div  className=' p-2 hidden md:block lg:block'>${formatNumber(marketcap)}</div >}
-
-      {volume !== undefined && <div  className=' p-2 hidden lg:block'>${formatNumber(volume)}</div >}
-
-      {circulatingsupply !== undefined && symbol !== undefined && (
-        <div  className=' p-2 hidden lg:block'>{`${formatNumber(circulatingsupply)} ${symbol.toUpperCase()}`}</div >
-      )}
-
-      {sparkline !== undefined && (
-        <div className='hidden md:block lg:block' >
-          <SparkLine color={checkTrend(change7d)==='up'?['#17D082']:['#F43D46']} prices={sparkline} />
-        </div >
-      )}
-    </div>
+      <TableCell className='p-2 hidden md:table-cell text-right'>
+        {sparkline !== undefined && sparkline.length > 0 && (
+          <div className='w-full max-w-[180px] ml-auto h-20 flex items-center'>
+            <SparkLine color={checkTrend(change7d)==='up'?['#17D082']:['#F43D46']} prices={sparkline} />
+          </div>
+        )}
+      </TableCell>
+    </TableRow>
     
    
   );

@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN preferred_currency VARCHAR(10) DEFAULT 'USD';

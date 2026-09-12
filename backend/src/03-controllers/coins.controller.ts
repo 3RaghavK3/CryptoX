@@ -10,7 +10,8 @@ export const getMarkets = async (
 ) => {
     try {
         const {
-            order,
+            sort_by,
+            dir,
             per_page,
             page,
         } = req.query as unknown as GetMarketsInput;
@@ -18,7 +19,8 @@ export const getMarkets = async (
         const result = await coinsService.getMarketsFromDb(
             page,
             per_page,
-            order
+            sort_by,
+            dir
         );
 
         res.status(200).json(result);

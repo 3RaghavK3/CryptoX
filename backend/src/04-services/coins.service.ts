@@ -3,15 +3,15 @@ import * as coingeckoService from "./coingecko.service.js";
 import redisClient from "../config/redis.js";
 import { REDIS_KEYS, getMarketPageTTL, getCoinDetailsTTL, getGlobalTrendingTTL } from "../utils/redisKeys.js";
 
-export const getMarketsFromDb = async (page: number, perPage: number, orderBy: string) => {
-    const cacheKey = REDIS_KEYS.MARKET_PAGE(page);
+export const getMarketsFromDb = async (page: number, perPage: number, sortBy: string, dir: string) => {
+    const cacheKey = REDIS_KEYS.MARKET_PAGE(page, sortBy, dir);
     const cachedData = await redisClient.get(cacheKey);
     
     if (cachedData) {
         return JSON.parse(cachedData);
     }
 
-    const data = await coinsRepository.getMarketsFromDb(page, perPage, orderBy);
+    const data = await coinsRepository.getMarketsFromDb(page, perPage, sortBy, dir);
     
     if (data) {
         await redisClient.setex(cacheKey, getMarketPageTTL(page), JSON.stringify(data));
@@ -84,7 +84,7 @@ export const getGlobalDataFromDb = async () => {
 };
 
 export const getTrendingCoinsFromDb = async () => {
-    const cacheKey = REDIS_KEYS.TRENDING_COINS;
+    const cacheKey = REDIS_KEYS.TRENDING_COINS + '_v2';
     const cachedData = await redisClient.get(cacheKey);
 
     if (cachedData) {

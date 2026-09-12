@@ -1,6 +1,8 @@
 import { Worker } from "bullmq";
 import { connection, marketQueue } from "../config/bullmq.js";
 import * as coingeckoService from "../04-services/coingecko.service.js";
+import * as exchangeService from "../04-services/exchange.service.js";
+import redis from "../config/redis.js";
 import {
   upsertMarketData,
   upsertGlobal,
@@ -110,6 +112,13 @@ const worker = new Worker(
         await upsertDetails(remaining);
         break;
       }
+      case "sync-exchange-rates": {
+        console.log("Fetching latest exchange rates from Frankfurter API...");
+        const rates = await exchangeService.fetchExchangeRates();
+        await redis.set("exchange_rates:USD", JSON.stringify(rates));
+        console.log("Successfully cached exchange rates to Redis.");
+        break;
+      }
       default:
         console.warn(`Unknown job name: ${job.name}`);
     }
@@ -152,43 +161,48 @@ const setupJobs = async () => {
 
   await marketQueue.upsertJobScheduler(
     "scheduler-top250",
-    { every: 150000 },
+    { every: 150000 }, // 2.5 mins (TTL: 3 mins)
     { name: "sync-top250", opts: { removeOnComplete: true, removeOnFail: true } },
   );
   await marketQueue.upsertJobScheduler(
     "scheduler-251-500",
-    { pattern: "*/5 * * * *" },
+    { every: 270000 }, // 4.5 mins (TTL: 5 mins)
     { name: "sync-251-500", opts: { removeOnComplete: true, removeOnFail: true } },
   );
   await marketQueue.upsertJobScheduler(
     "scheduler-501-2000",
-    { pattern: "*/15 * * * *" },
+    { every: 840000 }, // 14 mins (TTL: 15 mins)
     { name: "sync-501-2000", opts: { removeOnComplete: true, removeOnFail: true } },
   );
   await marketQueue.upsertJobScheduler(
     "scheduler-2001-5000",
-    { pattern: "0 * * * *" },
+    { every: 3420000 }, // 57 mins (TTL: 60 mins)
     { name: "sync-2001-5000", opts: { removeOnComplete: true, removeOnFail: true } },
   );
   await marketQueue.upsertJobScheduler(
     "scheduler-5001-plus",
-    { pattern: "0 */3 * * *" },
+    { every: 10500000 }, // 2h 55m (TTL: 3 hours)
     { name: "sync-5001-plus", opts: { removeOnComplete: true, removeOnFail: true } },
   );
   await marketQueue.upsertJobScheduler(
     "scheduler-global-trending",
-    { pattern: "*/30 * * * *" },
+    { every: 1680000 }, // 28 mins (TTL: 30 mins)
     { name: "sync-global-trending", opts: { removeOnComplete: true, removeOnFail: true } },
   );
   await marketQueue.upsertJobScheduler(
     "scheduler-top100-details",
-    { pattern: "0 0 * * *" },
+    { every: 84600000 }, // 23.5 hours (TTL: 24 hours)
     { name: "sync-top100-details", opts: { removeOnComplete: true, removeOnFail: true } },
   );
   await marketQueue.upsertJobScheduler(
     "scheduler-remaining-details",
-    { pattern: "0 0 * * *" },
+    { every: 85200000 }, // 23h 40m (Staggered)
     { name: "sync-remaining-details", opts: { removeOnComplete: true, removeOnFail: true } },
+  );
+  await marketQueue.upsertJobScheduler(
+    "scheduler-exchange-rates",
+    { every: 3420000 }, // 57 mins
+    { name: "sync-exchange-rates", opts: { removeOnComplete: true, removeOnFail: true } },
   );
 
   console.log("Scheduler setup complete.");
@@ -196,6 +210,11 @@ const setupJobs = async () => {
   console.log("Adding initial sync for global and trending data to queue...");
   await marketQueue.add(
     "sync-global-trending",
+    {},
+    { removeOnComplete: true, removeOnFail: true },
+  );
+  await marketQueue.add(
+    "sync-exchange-rates",
     {},
     { removeOnComplete: true, removeOnFail: true },
   );

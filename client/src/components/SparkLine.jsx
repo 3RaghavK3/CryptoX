@@ -10,7 +10,7 @@ export function SparkLine({ prices, color }) {
       {
         data: prices,
         borderColor: color,
-        borderWidth: 1.5,
+        borderWidth: 2,
         pointRadius: 0,
         fill: false,
         tension: 0.3,
