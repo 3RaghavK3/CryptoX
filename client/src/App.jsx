@@ -1,4 +1,4 @@
-import { useState } from 'react';
+
 import { Homepage } from './components/Homepage';
 import { Routes, Route } from 'react-router-dom';
 import { CoinDetail } from './components/Coindetail';
@@ -13,6 +13,8 @@ import { SignupForm } from './components/signup-form';
 import { Navigate } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Loading } from './components/Loading';
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -29,24 +31,24 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
       <AuthProvider>
-        <WishlistProvider>
-          <Header />
-          <Routes>
-            <Route path="/login" element={<div className="min-h-screen flex items-center justify-center bg-[#0d1421]"><LoginForm className="w-full max-w-sm" /></div>} />
-            <Route path="/signup" element={<div className="min-h-screen flex items-center justify-center bg-[#0d1421]"><SignupForm className="w-full max-w-sm" /></div>} />
-            <Route path="/" element={<Homepage />} />
-            <Route path="/trending" element={<Trending />} />
-            <Route path="/coindetail/:id" element={<CoinDetail />} />
-            <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-
-          </Routes>
-        </WishlistProvider>
+        <TooltipProvider>
+          <WishlistProvider>
+            <Header />
+            <Routes>
+              <Route path="/login" element={<div className="min-h-screen flex items-center justify-center bg-[#0d1421]"><LoginForm className="w-full max-w-sm" /></div>} />
+              <Route path="/signup" element={<div className="min-h-screen flex items-center justify-center bg-[#0d1421]"><SignupForm className="w-full max-w-sm" /></div>} />
+              <Route path="/" element={<Homepage />} />
+              <Route path="/trending" element={<Trending />} />
+              <Route path="/coindetail/:id" element={<CoinDetail />} />
+              <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            </Routes>
+            <Toaster theme="dark" />
+          </WishlistProvider>
+        </TooltipProvider>
       </AuthProvider>
     </>
   );

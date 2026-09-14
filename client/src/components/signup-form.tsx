@@ -15,6 +15,11 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const navigate = useNavigate();
@@ -141,14 +146,16 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               {error && <div className="text-red-500 text-sm text-center mb-2">{error}</div>}
               <Field>
                 <FieldLabel htmlFor="otp">One-Time Password</FieldLabel>
-                <Input 
-                  id="otp" 
-                  type="text" 
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter 6-digit code" 
-                  required 
-                />
+                <InputOTP maxLength={6} value={otp} onChange={setOtp} className="gap-2">
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} className="bg-slate-900 border-slate-700" />
+                    <InputOTPSlot index={1} className="bg-slate-900 border-slate-700" />
+                    <InputOTPSlot index={2} className="bg-slate-900 border-slate-700" />
+                    <InputOTPSlot index={3} className="bg-slate-900 border-slate-700" />
+                    <InputOTPSlot index={4} className="bg-slate-900 border-slate-700" />
+                    <InputOTPSlot index={5} className="bg-slate-900 border-slate-700" />
+                  </InputOTPGroup>
+                </InputOTP>
               </Field>
               <Field>
                 <Button type="submit" disabled={isLoading}>

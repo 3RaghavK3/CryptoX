@@ -11,8 +11,12 @@ const worker = new Worker(
 
     if (job.name === "process-alerts") {
       try {
-        const notifications = await alertRepo.processSatisfiedAlerts();
-        console.log(`Processed alerts. Created ${notifications.length} pending notifications.`);
+        // 1. Process satisfied alerts (marks as COMPLETED and creates PENDING notifications)
+        await alertRepo.processSatisfiedAlerts();
+        
+        // 2. Fetch all unsent notifications (PENDING or FAILED) to attempt email dispatch
+        const notifications = await alertRepo.getUnsentNotifications();
+        console.log(`Fetched ${notifications.length} unsent notifications for dispatch.`);
 
         if (notifications.length > 0) {
           console.log(`Triggering email dispatch for ${notifications.length} notifications...`);

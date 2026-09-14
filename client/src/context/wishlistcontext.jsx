@@ -1,4 +1,4 @@
-import { createContext, use, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 
 // @ts-ignore
 export const WishlistContext = createContext();

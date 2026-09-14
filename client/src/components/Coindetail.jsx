@@ -1,9 +1,10 @@
 import { ArrowDown, ArrowUp, ThumbsDown, ThumbsUp } from 'lucide-react';
-import { use, useContext, useEffect, useState } from 'react';
-import { useFetcher, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Header } from './Header';
 import { useAuth } from '../context/AuthContext';
 import { formatCurrency } from '../lib/currency';
+import { AddAlertDialog } from './AddAlertDialog';
 
 import { Loading } from './Loading';
 export function CoinDetail() {
@@ -85,10 +86,11 @@ export function CoinDetail() {
             : <>
 
               <div className="bg-[#0d1421] text-white  p-4 py-2 items-center text- rounded-xl md:flex justify-between">
-                <div className="flex justify-between md:gap-3 lg:gap-8">
-                  <div>
+                <div className="flex justify-between md:gap-3 lg:gap-8 items-center">
+                  <div className="flex items-center gap-2">
                     <span>{CoinDetailArray?.name} </span>
                     <span className='hidden md:inline'>({CoinDetailArray?.symbol})</span>
+                    <AddAlertDialog coinId={id} currentPrice={CoinDetailArray?.market_data?.current_price['usd']} />
                   </div>
                   <div>|</div>
                   <div>

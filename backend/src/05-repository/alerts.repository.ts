@@ -43,10 +43,13 @@ export const deleteAlert = async (
 
 export const getAlertsForUser = async (userId: number) => {
   const query = `
-    SELECT coin_id, type, price, created_at
-    FROM alert_coins
-    WHERE user_id = $1
-    ORDER BY created_at DESC;
+    SELECT 
+      a.coin_id, a.type, a.price, a.created_at, a.status,
+      c.name as coin_name, c.symbol as coin_symbol, c.image_url as coin_image, c.current_price, c.price_change_percentage_24h
+    FROM alert_coins a
+    JOIN coins c ON a.coin_id = c.coin_id
+    WHERE a.user_id = $1
+    ORDER BY a.created_at DESC;
   `;
   const result = await pool.query(query, [userId]);
   return result.rows;
@@ -62,10 +65,11 @@ export const processSatisfiedAlerts = async () => {
       SELECT a.user_id, a.coin_id, a.type, a.price as target_price, c.current_price
       FROM alert_coins a
       JOIN coins c ON a.coin_id = c.coin_id
-      WHERE
+      WHERE a.status = 'ACTIVE' AND (
         (a.type = 'PRICE_ABOVE' AND c.current_price >= a.price)
         OR
         (a.type = 'PRICE_BELOW' AND c.current_price <= a.price)
+      )
     `);
 
     const insertedNotifications = [];
@@ -88,7 +92,8 @@ export const processSatisfiedAlerts = async () => {
 
     for (const alert of alerts) {
       await client.query(
-        `DELETE FROM alert_coins
+        `UPDATE alert_coins
+         SET status = 'COMPLETED'
          WHERE user_id = $1
            AND coin_id = $2
            AND type = $3`,
@@ -97,13 +102,31 @@ export const processSatisfiedAlerts = async () => {
     }
 
     await client.query("COMMIT");
-    return insertedNotifications;
+    // We don't need to return them here anymore, we'll fetch all unsent separately
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;
   } finally {
     client.release();
   }
+};
+
+export const getUnsentNotifications = async () => {
+  const query = `
+    SELECT 
+      n.id as notification_id, 
+      n.user_id, 
+      n.coin_id, 
+      n.notification_type, 
+      c.current_price, 
+      a.price as target_price
+    FROM notifications n
+    JOIN coins c ON n.coin_id = c.coin_id
+    JOIN alert_coins a ON n.user_id = a.user_id AND n.coin_id = a.coin_id AND n.notification_type = a.type
+    WHERE n.status IN ('PENDING', 'FAILED')
+  `;
+  const res = await pool.query(query);
+  return res.rows;
 };
 
 export const updateNotificationStatus = async (notificationId: number, status: string) => {

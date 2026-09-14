@@ -1,4 +1,4 @@
-import { createElement, useEffect, useState, useContext, useRef } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { CoinCard } from './CoinCard';
 import { WishlistContext } from '../context/wishlistcontext';
 import {
@@ -22,15 +22,13 @@ import {
 
 export function Market({ onLoad }) {
   const [marketArray, setmarketarray] = useState([]);
-  const [originalArray, setoriginalarray] = useState([]);
   const [lastsortedkey, setlastsortedkey] = useState('rank');
   const [sortstate, setsortstate] = useState(0);
-  const { LikedCoins, setLikedCoins } = useContext(WishlistContext);
+  const { LikedCoins } = useContext(WishlistContext);
   const window_size = 50;
   const [windowstart, setwindow] = useState(0);
 
   const windowsentinel = useRef(null);
-  const backendsentinel = useRef(null);
   const counter = Math.floor(70 / window_size);
   const unit_coutner = useRef(0);
   const [page, setPage] = useState(1);
@@ -65,10 +63,8 @@ export function Market({ onLoad }) {
       .then((data) => {
         if (page === 1) {
           setmarketarray(data);
-          setoriginalarray(data);
         } else {
           setmarketarray((prev) => [...(prev || []), ...data]);
-          setoriginalarray((prev) => [...(prev || []), ...data]);
         }
       })
       .catch((e) => console.log(e))
@@ -207,6 +203,7 @@ export function Market({ onLoad }) {
               <TableHeader>
                 <TableRow className="hover:bg-transparent border-slate-700">
                   <TableHead className="w-[50px]"></TableHead>
+                  <TableHead className="w-[40px]"></TableHead>
                   <TableHead
                     className="w-[40px] font-bold text-slate-300 cursor-pointer"
                     onClick={() => handleSort('rank')}

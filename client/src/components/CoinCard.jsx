@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUp } from 'lucide-react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { useAuth } from '../context/AuthContext';
 import { formatCurrency } from '../lib/currency';
+import { AddAlertDialog } from './AddAlertDialog';
 
 export function CoinCard({
   id,
@@ -95,6 +96,10 @@ export function CoinCard({
             />
           </svg>
         </div>
+      </TableCell>
+
+      <TableCell className="w-[40px] p-2 text-center" onClick={(e) => e.stopPropagation()}>
+        <AddAlertDialog coinId={id} currentPrice={price} />
       </TableCell>
 
       <TableCell className="w-[40px] text-slate-400 p-2">{rank !== undefined ? rank : ''}</TableCell>
