@@ -5,6 +5,7 @@ import { CoinDetail } from './components/Coindetail';
 import { WishlistProvider } from './context/wishlistcontext';
 import { Wishlist } from './components/wishlist';
 import { Trending } from './components/Trending';
+import { Profile } from './components/Profile';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginForm } from './components/login-form';
@@ -42,6 +43,7 @@ function App() {
             <Route path="/trending" element={<Trending />} />
             <Route path="/coindetail/:id" element={<CoinDetail />} />
             <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
           </Routes>
         </WishlistProvider>

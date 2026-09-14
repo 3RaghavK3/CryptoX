@@ -2,12 +2,17 @@ import { ArrowDown, ArrowUp, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { use, useContext, useEffect, useState } from 'react';
 import { useFetcher, useParams } from 'react-router-dom';
 import { Header } from './Header';
+import { useAuth } from '../context/AuthContext';
+import { formatCurrency } from '../lib/currency';
 
 import { Loading } from './Loading';
 export function CoinDetail() {
   const { id } = useParams();
   const [CoinDetailArray, setCoinDetailArray] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const prefCurrency = user?.preferredCurrency || "USD";
+  const multiplier = user?.currencyMultiplier || 1;
   useEffect(() => {
     setLoading(true);
     fetch(`${import.meta.env.VITE_API_URL}/api/coins/${id}`)
@@ -57,14 +62,14 @@ export function CoinDetail() {
 
 
 
-  const [currency, setcurrency] = useState({ name: 'usd', symbol: '$' });
+
 
   const market_price_change_perc = {
-    '1h': CoinDetailArray?.market_data?.price_change_percentage_1h_in_currency?.[currency.name],
-    '24h': CoinDetailArray?.market_data?.price_change_percentage_24h_in_currency?.[currency.name],
-    '7d': CoinDetailArray?.market_data?.price_change_percentage_7d_in_currency?.[currency.name],
-    '14d': CoinDetailArray?.market_data?.price_change_percentage_14d_in_currency?.[currency.name],
-    '30d': CoinDetailArray?.market_data?.price_change_percentage_30d_in_currency?.[currency.name],
+    '1h': CoinDetailArray?.market_data?.price_change_percentage_1h_in_currency?.['usd'],
+    '24h': CoinDetailArray?.market_data?.price_change_percentage_24h_in_currency?.['usd'],
+    '7d': CoinDetailArray?.market_data?.price_change_percentage_7d_in_currency?.['usd'],
+    '14d': CoinDetailArray?.market_data?.price_change_percentage_14d_in_currency?.['usd'],
+    '30d': CoinDetailArray?.market_data?.price_change_percentage_30d_in_currency?.['usd'],
   };
 
 
@@ -87,8 +92,7 @@ export function CoinDetail() {
                   </div>
                   <div>|</div>
                   <div>
-                    {currency.symbol}
-                    {CoinDetailArray?.market_data?.current_price['usd']?.toLocaleString()}
+                    {formatCurrency(CoinDetailArray?.market_data?.current_price['usd'], prefCurrency, multiplier)}
                   </div>
                   <div>|</div>
                   <div className="flex gap-2">
@@ -115,20 +119,7 @@ export function CoinDetail() {
                     {' '}
                     Last Updated at {new Date(CoinDetailArray?.last_updated).toLocaleTimeString()}{' '}
                   </span>
-                  <div className="flex">
-                    <div
-                      className={`p-2 rounded-sm cursor-pointer ${currency.name == 'usd' ? 'bg-green-500' : 'bg-black'}`}
-                      onClick={() => setcurrency({ name: 'usd', symbol: '$' })}
-                    >
-                      USD $
-                    </div>
-                    <div
-                      className={`p-2 rounded-sm cursor-pointer ${currency.name == 'inr' ? 'bg-green-500' : 'bg-black'}`}
-                      onClick={() => setcurrency({ name: 'inr', symbol: '₹' })}
-                    >
-                      INR ₹
-                    </div>
-                  </div>
+                  
                 </div>
               </div>
 
@@ -138,24 +129,21 @@ export function CoinDetail() {
                     <div className="flex flex-col items-center ">
                       <div>Current Price</div>
                       <div className="font-bold text-2xl">
-                        {currency.symbol}
-                        {CoinDetailArray?.market_data?.current_price['usd']?.toLocaleString()}
+                        {formatCurrency(CoinDetailArray?.market_data?.current_price['usd'], prefCurrency, multiplier)}
                       </div>
                     </div>
 
                     <div className="flex gap-2">
                       <span>24 High:</span>
                       <span>
-                        {currency.symbol}
-                        {CoinDetailArray?.market_data?.high_24h['usd']?.toLocaleString()}
+                        {formatCurrency(CoinDetailArray?.market_data?.high_24h['usd'], prefCurrency, multiplier)}
                       </span>
                     </div>
 
                     <div className="flex gap-2">
                       <span>24 Low:</span>
                       <span>
-                        {currency.symbol}
-                        {CoinDetailArray?.market_data?.low_24h['usd']?.toLocaleString()}
+                        {formatCurrency(CoinDetailArray?.market_data?.low_24h['usd'], prefCurrency, multiplier)}
                       </span>
                     </div>
                   </div>
@@ -198,8 +186,7 @@ export function CoinDetail() {
                         <div className="flex gap-2">
                           <span>ATH:</span>
                           <span>
-                            {currency.symbol}
-                            {CoinDetailArray?.market_data?.ath['usd']?.toLocaleString()}
+                            {formatCurrency(CoinDetailArray?.market_data?.ath['usd'], prefCurrency, multiplier)}
                           </span>
                         </div>
 
@@ -207,7 +194,7 @@ export function CoinDetail() {
                           <span>On:</span>
                           <span>
                             {new Date(
-                              CoinDetailArray?.market_data?.ath_date[currency.name]
+                              CoinDetailArray?.market_data?.ath_date['usd']
                             ).toLocaleDateString()}
                           </span>
                         </div>
@@ -216,7 +203,7 @@ export function CoinDetail() {
                           <span>At:</span>
                           <span>
                             {new Date(
-                              CoinDetailArray?.market_data?.ath_date[currency.name]
+                              CoinDetailArray?.market_data?.ath_date['usd']
                             ).toLocaleTimeString()}
                           </span>
                         </div>
@@ -224,7 +211,7 @@ export function CoinDetail() {
                         <div className="flex">
                           <span>ATH%:</span>
                           <span>
-                            {CoinDetailArray?.market_data?.ath_change_percentage[currency.name] > 0 ? (
+                            {CoinDetailArray?.market_data?.ath_change_percentage['usd'] > 0 ? (
                               <ArrowUp className="text-green-500" />
                             ) : (
                               <ArrowDown className="text-red-500" />
@@ -232,13 +219,13 @@ export function CoinDetail() {
                           </span>
 
                           <span
-                            className={`${CoinDetailArray?.market_data?.ath_change_percentage[currency.name] > 0
+                            className={`${CoinDetailArray?.market_data?.ath_change_percentage['usd'] > 0
                               ? 'text-green-500'
                               : 'text-red-500'
                               }`}
                           >
                             {Number(
-                              CoinDetailArray?.market_data?.ath_change_percentage[currency.name]
+                              CoinDetailArray?.market_data?.ath_change_percentage['usd']
                             ).toFixed(2)}
                             %{' '}
                           </span>
@@ -249,8 +236,7 @@ export function CoinDetail() {
                         <div className="flex gap-2">
                           <span>ATL:</span>
                           <span>
-                            {currency.symbol}
-                            {CoinDetailArray?.market_data?.atl['usd']?.toLocaleString()}
+                            {formatCurrency(CoinDetailArray?.market_data?.atl['usd'], prefCurrency, multiplier)}
                           </span>
                         </div>
 
@@ -258,7 +244,7 @@ export function CoinDetail() {
                           <span>On:</span>
                           <span>
                             {new Date(
-                              CoinDetailArray?.market_data?.atl_date[currency.name]
+                              CoinDetailArray?.market_data?.atl_date['usd']
                             ).toLocaleDateString()}
                           </span>
                         </div>
@@ -267,7 +253,7 @@ export function CoinDetail() {
                           <span>At:</span>
                           <span>
                             {new Date(
-                              CoinDetailArray?.market_data?.atl_date[currency.name]
+                              CoinDetailArray?.market_data?.atl_date['usd']
                             ).toLocaleTimeString()}
                           </span>
                         </div>
@@ -275,7 +261,7 @@ export function CoinDetail() {
                         <div className="flex">
                           <span>ATL%:</span>
                           <span>
-                            {CoinDetailArray?.market_data?.atl_change_percentage[currency.name] > 0 ? (
+                            {CoinDetailArray?.market_data?.atl_change_percentage['usd'] > 0 ? (
                               <ArrowUp className="text-green-500" />
                             ) : (
                               <ArrowDown className="text-red-500" />
@@ -283,13 +269,13 @@ export function CoinDetail() {
                           </span>
 
                           <span
-                            className={`${CoinDetailArray?.market_data?.atl_change_percentage[currency.name] > 0
+                            className={`${CoinDetailArray?.market_data?.atl_change_percentage['usd'] > 0
                               ? 'text-green-500'
                               : 'text-red-500'
                               }`}
                           >
                             {Number(
-                              CoinDetailArray?.market_data?.atl_change_percentage[currency.name]
+                              CoinDetailArray?.market_data?.atl_change_percentage['usd']
                             ).toFixed(2)}
                             %{' '}
                           </span>
@@ -346,31 +332,24 @@ export function CoinDetail() {
                     <div className="flex">Market Cap</div>
 
                     <div className="text-2xl font-bold text-center">
-                      {currency.symbol}
-                      {CoinDetailArray?.market_data?.market_cap['usd']?.toLocaleString()}
+                      {formatCurrency(CoinDetailArray?.market_data?.market_cap['usd'], prefCurrency, multiplier)}
                     </div>
 
                     <div className="flex items-center justify-center gap-2">
-                      {CoinDetailArray?.market_data?.market_cap_change_percentage_24h_in_currency[
-                        currency.name
-                      ] > 0 ? (
+                      {CoinDetailArray?.market_data?.market_cap_change_percentage_24h_in_currency['usd'] > 0 ? (
                         <ArrowUp className="text-green-500" />
                       ) : (
                         <ArrowDown className="text-red-500" />
                       )}
                       <span
                         className={
-                          CoinDetailArray?.market_data?.market_cap_change_percentage_24h_in_currency[
-                            currency.name
-                          ] > 0
+                          CoinDetailArray?.market_data?.market_cap_change_percentage_24h_in_currency['usd'] > 0
                             ? 'text-green-500'
                             : 'text-red-500'
                         }
                       >
                         {Number(
-                          CoinDetailArray?.market_data?.market_cap_change_percentage_24h_in_currency[
-                          currency.name
-                          ]
+                          CoinDetailArray?.market_data?.market_cap_change_percentage_24h_in_currency['usd']
                         ).toFixed(2)}
                         %
                       </span>

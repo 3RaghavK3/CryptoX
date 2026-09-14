@@ -169,6 +169,19 @@ export const login =async(email:string,password:string)=>{
       const hashedRefreshToken = crypto.createHash("sha256").update(refreshToken).digest("hex");
       await authrepository.setToken(user.user_id,hashedRefreshToken);
 
+      const preferredCurrency = user.preferred_currency || "USD";
+      let currencyMultiplier = 1;
+      
+      if (preferredCurrency !== "USD") {
+         const ratesStr = await redis.get("exchange_rates:USD");
+         if (ratesStr) {
+            const rates = JSON.parse(ratesStr);
+            if (rates[preferredCurrency]) {
+               currencyMultiplier = rates[preferredCurrency];
+            }
+         }
+      }
+
       return {
       accessToken,
       refreshToken,
@@ -176,6 +189,8 @@ export const login =async(email:string,password:string)=>{
          userId: user.user_id,
          name: user.name,
          email: user.email,
+         preferredCurrency,
+         currencyMultiplier,
       },
       };
 }

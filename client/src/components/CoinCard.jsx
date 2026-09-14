@@ -4,6 +4,8 @@ import { useContext } from 'react';
 import { WishlistContext } from '../context/wishlistcontext';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { TableCell, TableRow } from "@/components/ui/table";
+import { useAuth } from '../context/AuthContext';
+import { formatCurrency } from '../lib/currency';
 
 export function CoinCard({
   id,
@@ -39,6 +41,10 @@ export function CoinCard({
   const navigate = useNavigate();
 
   const { LikedCoins, setLikedCoins } = useContext(WishlistContext);
+  const { user } = useAuth();
+
+  const prefCurrency = user?.preferredCurrency || "USD";
+  const multiplier = user?.currencyMultiplier || 1;
 
   const isLiked = LikedCoins.some((coin) => coin.id === id);
 
@@ -108,7 +114,7 @@ export function CoinCard({
       </TableCell>
 
       <TableCell className='p-2 font-semibold'>
-        {price !== undefined ? `$${formatNumber(price)}` : ''}
+        {price !== undefined && price !== null ? formatCurrency(price, prefCurrency, multiplier) : ''}
       </TableCell>
 
       <TableCell className='p-2 hidden lg:table-cell'>
@@ -152,11 +158,11 @@ export function CoinCard({
 
 
       <TableCell className='p-2 hidden md:table-cell text-slate-300'>
-        {marketcap !== undefined ? `$${formatNumber(marketcap)}` : ''}
+        {marketcap !== undefined && marketcap !== null ? formatCurrency(marketcap, prefCurrency, multiplier) : ''}
       </TableCell>
 
       <TableCell className='p-2 hidden lg:table-cell text-slate-300'>
-        {volume !== undefined ? `$${formatNumber(volume)}` : ''}
+        {volume !== undefined && volume !== null ? formatCurrency(volume, prefCurrency, multiplier) : ''}
       </TableCell>
 
       <TableCell className='p-2 hidden lg:table-cell text-slate-300'>

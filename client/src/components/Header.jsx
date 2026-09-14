@@ -39,6 +39,13 @@ export function Header() {
         >
           Wishlist
         </span>
+        <span
+          onClick={() => {
+            navigate('/profile');
+          }}
+        >
+          Profile
+        </span>
       </div>
     </header>
   );

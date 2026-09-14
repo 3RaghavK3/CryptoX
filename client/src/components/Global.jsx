@@ -1,7 +1,14 @@
 import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { formatCurrency } from '../lib/currency';
+
 export function Global({ onLoad }) {
   const [globalarray, settglobalarray] = useState(null);
+  const { user } = useAuth();
+
+  const prefCurrency = user?.preferredCurrency || "USD";
+  const multiplier = user?.currencyMultiplier || 1;
 
   useEffect(() => {
     // @ts-ignore
@@ -35,14 +42,14 @@ export function Global({ onLoad }) {
             <div className="rounded-md bg-[#0d1421] p-2">
               <div className="flex flex-col font-bold text-white">Market-Cap</div>
               <div className="font-semibold text-[#f2d27b] break-words">
-                {globalarray ? `$${formatNumber(globalarray.total_market_cap?.usd || globalarray.total_market_cap || 0)}` : 'Loading...'}
+                {globalarray ? formatCurrency(globalarray.total_market_cap?.usd || globalarray.total_market_cap || 0, prefCurrency, multiplier) : 'Loading...'}
               </div>
             </div>
 
             <div className="rounded-md bg-[#0d1421] p-2">
               <div className="flex flex-col font-bold text-white">Total Volume (24h)</div>
               <div className="font-semibold text-[#f2d27b] break-words">
-                {globalarray ? `$${formatNumber(globalarray.total_volume?.usd || globalarray.total_volume_24h || 0)}` : 'Loading...'}
+                {globalarray ? formatCurrency(globalarray.total_volume?.usd || globalarray.total_volume_24h || 0, prefCurrency, multiplier) : 'Loading...'}
               </div>
             </div>
 

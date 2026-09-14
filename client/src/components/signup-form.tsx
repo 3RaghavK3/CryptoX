@@ -66,7 +66,6 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       const data = await res.json();
       
       if (res.ok) {
-        // Success! Redirect to login.
         navigate("/login");
       } else {
         setError(data.message || "Invalid OTP");

@@ -12,9 +12,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "start:worker": "node dist/workers/market.worker.js",
-    "start:worker:alerts": "node dist/workers/alerts.worker.js",
-    "bootstrap:markets": "tsx src/scripts/bootstrap-markets.ts",
-    "bootstrap:details": "tsx src/scripts/bootstrap-details.ts"
+    "start:worker:alerts": "node dist/workers/alerts.worker.js"
   },
   "keywords": [],
   "author": "",
